@@ -7,8 +7,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
-    @movies = Movie.find(:all, :order => "title")
+    @movies = Movie.find(:all, :order => params[:sort])
+    if params[:sort] == "title ASC" 
+      @title_hilite = "hilite" #setting the title header to hilite if clicked
+    elsif params[:sort] == "release_date ASC" 
+      @rd_hilite = "hilite" #setting the release date header to hilite if clicked
+    end
 
   end
 
