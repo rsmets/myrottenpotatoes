@@ -61,20 +61,20 @@ class MoviesController < ApplicationController
       @rd_hilite = "hilite" #setting the release date header to hilite if clicked
     end
 
-    @all_ratings = ['G', 'PG', 'PG-13', 'R']
-    @selected_ratings = @all_ratings
+#@all_ratings = ['G', 'PG', 'PG-13', 'R']
+# @selected_ratings = @all_ratings
+    @selected_ratings = @ratings.keys if @ratings
 
-    flash[:ratings] = params[:ratings].keys if params[:ratings] != nil
-    @selected_ratings = flash[:ratings] if flash[:ratings] != nil
-    @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort])
+    @movies = Movie.find_all_by_rating(@selected_ratings)
+    @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort]) if sort
 
     if params[:sort]
       session[:sort] = sort
-   end
+    end
 
-   if params[:ratings]
+    if params[:ratings]
      session[:ratings] = @ratings
-   end
+    end
 
   end
 
