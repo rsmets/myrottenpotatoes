@@ -9,50 +9,8 @@ class MoviesController < ApplicationController
   def index
 
     
-     if params[:commit]
-       session.delete(:ratings)
-       if session[:sort]
-         sort = session[:sort]
-         session.delete(:sort)
-         redirect_to(:action => "index", :sort => sort)
-       else
-         redirect_to(:action => "index")
-       end
-     end
 
-     if params[:sort]
-       sort = params[:sort]
-     elsif session[:sort]
-       sort = session[:sort]
-       session.delete(:sort)
-       if session[:ratings]
-         @ratings = session[:ratings]
-         session.delete(:ratings)
-         redirect_to(:action => "index", :sort => sort, :ratings => @ratings)
-       else
-         redirect_to(:action => "index", :sort => sort)
-       end
-     end
-
-    if params[:ratings]
-      @ratings = params[:ratings]
-    elsif session[:ratings]
-      @ratings = session[:ratings]
-      session.delete(:ratings)
-      if session[:sort]
-        sort = session[:sort]
-        session.delete(:sort)
-        redirect_to(:action => "index", :sort => sort, :ratings => @ratings)
-      else
-        redirect_to(:action => "index", :ratings => @ratings)
-      end
-    end
-
-    @all_ratings = []
-    Movie.all.each do |movie|
-      @all_ratings << movie.rating
-    end
-    @all_ratings.uniq!.sort!
+   
 
     #@movies = Movie.find(:all, :order => params[:sort])
     if params[:sort] == "title ASC" 
@@ -61,19 +19,19 @@ class MoviesController < ApplicationController
       @rd_hilite = "hilite" #setting the release date header to hilite if clicked
     end
 
-#@all_ratings = ['G', 'PG', 'PG-13', 'R']
-# @selected_ratings = @all_ratings
-    @selected_ratings = @ratings.keys if @ratings
+@all_ratings = ['G', 'PG', 'PG-13', 'R']
+ @selected_ratings = @all_ratings
+#@selected_ratings = @ratings.keys if @ratings
 
-    @movies = Movie.find_all_by_rating(@selected_ratings)
-    @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort]) if sort
+#@movies = Movie.find_all_by_rating(@selected_ratings)
+    @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort]) #if sort
 
     if params[:sort]
-      session[:sort] = sort
+#session[:sort] = sort
     end
 
     if params[:ratings]
-     session[:ratings] = @ratings
+#session[:ratings] = @ratings
     end
 
   end
