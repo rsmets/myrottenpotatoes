@@ -8,31 +8,68 @@ class MoviesController < ApplicationController
 
   def index
 
-    
+   @title_header, @release_header = nil
+   @all_ratings = Movie.getratings
+   @selected_ratings = @all_ratings
 
-   
+   if params[:commit]
+     session.delete(:ratings)
+     if session[:sort]
+       sort = session[:sort]
+       session.delete(:sort)
+       rediect = true
+     end
+   end
 
-    #@movies = Movie.find(:all, :order => params[:sort])
-    if params[:sort] == "title ASC" 
-      @title_hilite = "hilite" #setting the title header to hilite if clicked
-    elsif params[:sort] == "release_date ASC" 
-      @rd_hilite = "hilite" #setting the release date header to hilite if clicked
-    end
+   if params[:sort]
+     sort = params[:sort]
+   elsif session[:sort]
+     sort = session[:sort]
+     session.delete(:sort)
+     redirect = true
+     if session[:ratings]
+       @ratings = session[:ratings]
+       session.delete(:ratings)
+     end
+   end
 
-@all_ratings = ['G', 'PG', 'PG-13', 'R']
- @selected_ratings = @all_ratings
-#@selected_ratings = @ratings.keys if @ratings
+   if params[:ratings]
+     @ratings = params[:ratings]
+   elsif session[:ratings]
+     @ratings = session[:ratings]
+     session.delete(:ratings)
+     redirect = true
+     if session[:sort]
+       sort = session[:sort]
+       session.delete(:sort)
+     end
+   end
 
-#@movies = Movie.find_all_by_rating(@selected_ratings)
-    @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort]) #if sort
+   if params[:sort] == "title ASC"
+     @title_hilite = "hilite" #setting the title header to hilite if clicked
+   elsif params[:sort] == "release_date ASC"
+     @rd_hilite = "hilite" #setting the release date header to hilite if clicked
+   end
+              
+   if redirect
+     if @ratings && sort
+       redirect_to(:action => "index", :sort => sort, :ratings => @ratings)
+     elsif @ratings
+       redirect_to(:action => "index", :ratings => @ratings)
+     elsif sort
+       redirect_to(:action => "index", :sort => sort)
+     else
+       redirect_to(:action => "index")
+     end
+   end
 
-    if params[:sort]
-#session[:sort] = sort
-    end
+   @selected_ratings = @ratings.keys if @ratings
 
-    if params[:ratings]
-#session[:ratings] = @ratings
-    end
+   @movies = Movie.find_all_by_rating(@selected_ratings)
+   @movies = Movie.find_all_by_rating(@selected_ratings, :order => sort) if sort
+        
+   session[:sort] = sort if sort
+   session[:ratings] = @ratings if @ratings
 
   end
 
