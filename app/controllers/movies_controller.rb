@@ -7,13 +7,24 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.find(:all, :order => params[:sort])
+    #@movies = Movie.find(:all, :order => params[:sort])
     if params[:sort] == "title ASC" 
       @title_hilite = "hilite" #setting the title header to hilite if clicked
     elsif params[:sort] == "release_date ASC" 
       @rd_hilite = "hilite" #setting the release date header to hilite if clicked
     end
 
+    @all_ratings = ['G', 'PG', 'PG-13', 'R']
+    @selected_ratings = @all_ratings
+
+    flash[:ratings] = params[:ratings].keys if params[:ratings] != nil
+    @selected_ratings = flash[:ratings] if flash[:ratings] != nil
+    @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort])
+  end
+
+  def show
+    id = params[:id]
+    @movie = Movie.find(id)
   end
 
   def new
