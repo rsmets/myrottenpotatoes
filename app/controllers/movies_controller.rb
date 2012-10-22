@@ -1,13 +1,6 @@
 class MoviesController < ApplicationController
 
-  def show
-    id = params[:id] # retrieve movie ID from URI route
-    @movie = Movie.find(id) # look up movie by unique ID
-    # will render app/views/movies/show.<extension> by default
-  end
-
   def index
-
    @title_header, @release_header = nil
    @all_ratings = Movie.getratings
    @selected_ratings = @all_ratings
@@ -17,7 +10,7 @@ class MoviesController < ApplicationController
      if session[:sort]
        sort = session[:sort]
        session.delete(:sort)
-       rediect = true
+       redrect = true
      end
    end
 
@@ -45,12 +38,6 @@ class MoviesController < ApplicationController
      end
    end
 
-   if params[:sort] == "title ASC"
-     @title_hilite = "hilite" #setting the title header to hilite if clicked
-   elsif params[:sort] == "release_date ASC"
-     @rd_hilite = "hilite" #setting the release date header to hilite if clicked
-   end
-              
    if redirect
      if @ratings && sort
        redirect_to(:action => "index", :sort => sort, :ratings => @ratings)
@@ -64,6 +51,12 @@ class MoviesController < ApplicationController
    end
 
    @selected_ratings = @ratings.keys if @ratings
+
+   if sort == "title ASC"
+     @title_header = "hilite"
+   elsif sort == "release_date ASC"
+     @release_date_header = "hilite"
+   end
 
    @movies = Movie.find_all_by_rating(@selected_ratings)
    @movies = Movie.find_all_by_rating(@selected_ratings, :order => sort) if sort
