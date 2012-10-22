@@ -7,6 +7,53 @@ class MoviesController < ApplicationController
   end
 
   def index
+
+    
+     if params[:commit]
+       session.delete(:ratings)
+       if session[:sort]
+         sort = session[:sort]
+         session.delete(:sort)
+         redirect_to(:action => "index", :sort => sort)
+       else
+         redirect_to(:action => "index")
+       end
+     end
+
+     if params[:sort]
+       sort = params[:sort]
+     elsif session[:sort]
+       sort = session[:sort]
+       session.delete(:sort)
+       if session[:ratings]
+         @ratings = session[:ratings]
+         session.delete(:ratings)
+         redirect_to(:action => "index", :sort => sort, :ratings => @ratings)
+       else
+         redirect_to(:action => "index", :sort => sort)
+       end
+     end
+
+    if params[:ratings]
+      @ratings = params[:ratings]
+    elsif session[:ratings]
+      @ratings = session[:ratings]
+      session.delete(:ratings)
+      if session[:sort]
+        sort = session[:sort]
+        session.delete(:sort)
+        redirect_to(:action => "index", :sort => sort, :ratings => @ratings)
+      else
+        redirect_to(:action => "index", :ratings => @ratings)
+      end
+    end
+
+    @all_ratings = []
+    Movie.all.each do |movie|
+      @all_ratings << movie.rating
+    end
+    @all_ratings.uniq!.sort!
+
     #@movies = Movie.find(:all, :order => params[:sort])
     if params[:sort] == "title ASC" 
       @title_hilite = "hilite" #setting the title header to hilite if clicked
@@ -20,6 +67,15 @@ class MoviesController < ApplicationController
     flash[:ratings] = params[:ratings].keys if params[:ratings] != nil
     @selected_ratings = flash[:ratings] if flash[:ratings] != nil
     @movies = Movie.find_all_by_rating(@selected_ratings, :order => params[:sort])
+
+    if params[:sort]
+      session[:sort] = sort
+   end
+
+   if params[:ratings]
+     session[:ratings] = @ratings
+   end
+
   end
 
   def show
